@@ -85,10 +85,14 @@ app.MapPost("/signIn",  ([FromBody] SignInRequest signInRequest) =>
 
 app.MapPost("/signUp", ([FromBody] SignUpRequest signUpRequest) =>
 {
-    User? userInDb = UserRepository.users.FirstOrDefault(x => x.Email == signUpRequest.Email && x.PasswordHash == signUpRequest.PasswordHash);
+    User? userInDb = UserRepository.users.FirstOrDefault(x => x.Email == signUpRequest.Email && x.PasswordHash == signUpRequest.Password);
     
     if(userInDb is not null) 
         return Results.BadRequest();
+    
+    UserRepository.users.Add(new User(signUpRequest.Username, signUpRequest.Email,
+        signUpRequest.Password, "https://sun9-62.userapi.com/impf/-TVGNBqEWNAZB--OX_HMFhWqNChiQQr48XA09w/Qf-oDLi-o4Y.jpg?size=340x340&quality=96&sign=17b91c256f67c2232b317fa35b260c9e&type=album",
+        new List<string>(){"dsf"}, new List<string>(){"sdf"}));
     
     var claims = new List<Claim>() {new Claim(ClaimTypes.NameIdentifier, signUpRequest.Email) };
     
@@ -104,7 +108,6 @@ app.MapPost("/signUp", ([FromBody] SignUpRequest signUpRequest) =>
     var response = new
     {
         access_token = encodedJwt,
-        username = signUpRequest.Username,
         email = signUpRequest.Email
     };
  

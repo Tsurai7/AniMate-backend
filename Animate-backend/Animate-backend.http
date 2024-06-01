@@ -1,4 +1,4 @@
-@Animate_backend_HostAddress = http://localhost:5207
+@Animate_backend_HostAddress = http://localhost:10100
 
 GET {{Animate_backend_HostAddress}}/weatherforecast/
 Accept: application/json

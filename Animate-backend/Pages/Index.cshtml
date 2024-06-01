@@ -1,0 +1,56 @@
+﻿@page
+@model Animate_backend.Pages.IndexModel
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<h1>User Management</h1>
+
+<form method="post">
+    <h2>Add User</h2>
+    <div>
+        <label>Username</label>
+        <input type="text" asp-for="NewUser.Username" />
+    </div>
+    <div>
+        <label>Email</label>
+        <input type="email" asp-for="NewUser.Email" />
+    </div>
+    <div>
+        <label>Profile Image</label>
+        <input type="text" asp-for="NewUser.ProfileImage" />
+    </div>
+    <div>
+        <label>Password Hash</label>
+        <input type="text" asp-for="NewUser.PasswordHash" />
+    </div>
+    <button type="submit" asp-page-handler="AddUser">Add User</button>
+</form>
+
+<h2>Existing Users</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td>
+                    <form method="POST">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <button type="submit" asp-page-handler="DeleteUser">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

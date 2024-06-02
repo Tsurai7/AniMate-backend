@@ -24,11 +24,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JwtOptions:Issuer"],
+            ValidIssuer = AuthOptions.ISSUER,
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["JwtOptions:Audience"],
+            ValidAudience = AuthOptions.AUDIENCE,
             ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true,
         };
     });
@@ -51,8 +51,16 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
-
 AccountEndpoints.RegisterEndpoint(app);
 AnimeEndpoints.RegisterEndpoints(app);
 
 app.Run();
+
+public class AuthOptions
+{
+    public const string ISSUER = "MyAuthServer";
+    public const string AUDIENCE = "MyAuthClient";
+    const string KEY = "mysupersecret_secretsecretsecretkey!123";
+    public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
+}

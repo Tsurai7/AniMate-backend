@@ -1,21 +1,26 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Animate_backend.Data;
 using Animate_backend.Models.Dtos;
 using Animate_backend.Models.Entities;
-using Animate_backend.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Animate_backend.Endpoints;
 
 public static class AccountEndpoints
 {
+    private static ApplicationContext _context;
     public static void RegisterEndpoint(WebApplication app)
     {
+        var dbContextOptions = app.Services.GetRequiredService<DbContextOptions<ApplicationContext>>();
+        _context = new ApplicationContext(dbContextOptions);
+        
         app.MapPost("/signIn",  ([FromBody] SignInRequest signInRequest) =>
         {
-            User? userInDb = UserRepository.users.FirstOrDefault(x => x.Email == signInRequest.Email && x.PasswordHash == signInRequest.Password);
+            User? userInDb = _context.Users.FirstOrDefault(x => x.Email == signInRequest.Email && x.PasswordHash == signInRequest.Password);
             
             if(userInDb is null) 
                 return Results.Unauthorized();
@@ -43,12 +48,12 @@ public static class AccountEndpoints
 
         app.MapPost("/signUp", ([FromBody] SignUpRequest signUpRequest) =>
         {
-            User? userInDb = UserRepository.users.FirstOrDefault(x => x.Email == signUpRequest.Email && x.PasswordHash == signUpRequest.Password);
+            User? userInDb = _context.Users.FirstOrDefault(x => x.Email == signUpRequest.Email && x.PasswordHash == signUpRequest.Password);
             
             if(userInDb is not null) 
                 return Results.BadRequest();
             
-            UserRepository.users.Add(new User(signUpRequest.Username, signUpRequest.Email,
+            _context.Users.Add(new User(signUpRequest.Username, signUpRequest.Email,
                 signUpRequest.Password, "https://sun9-62.userapi.com/impf/-TVGNBqEWNAZB--OX_HMFhWqNChiQQr48XA09w/Qf-oDLi-o4Y.jpg?size=340x340&quality=96&sign=17b91c256f67c2232b317fa35b260c9e&type=album",
                 new List<string>(){"dsf"}, new List<string>(){"sdf"}));
             
@@ -77,7 +82,7 @@ public static class AccountEndpoints
         {
             string email = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
-            var user = UserRepository.users.FirstOrDefault(user => user.Email == email);
+            var user = _context.Users.FirstOrDefault(user => user.Email == email);
 
             if (user is not null)
                 return Results.Ok(new 

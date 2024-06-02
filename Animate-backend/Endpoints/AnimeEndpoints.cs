@@ -9,9 +9,6 @@ public class AnimeEndpoints
 {
     public static void RegisterEndpoints(WebApplication app)
     {
-        var dbContextOptions = app.Services.GetRequiredService<DbContextOptions<ApplicationContext>>();
-        _context = new ApplicationContext(dbContextOptions);
-        
         app.MapPatch("/addTitleToHistory", [Authorize](HttpContext context,  [FromHeader] string titleCode) =>
         {
             string email = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

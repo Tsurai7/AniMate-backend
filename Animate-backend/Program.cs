@@ -3,17 +3,19 @@ using Animate_backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Animate_backend.Repositories;
 using Animate_backend.Endpoints;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<ApplicationContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection")));
+
+builder.Services.AddScoped<UserRepository>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -28,7 +30,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true,
-        }; 
+        };
     });
 
 var app = builder.Build();
@@ -39,22 +41,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
- 
-app.UseAuthentication();  
-app.UseAuthorization();   
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
+app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapRazorPages();
+app.MapControllers();
 AccountEndpoints.RegisterEndpoint(app);
 AnimeEndpoints.RegisterEndpoints(app);
-
 
 app.Run();
 
 public class AuthOptions
 {
-    public const string ISSUER = "MyAuthServer"; 
+    public const string ISSUER = "MyAuthServer";
     public const string AUDIENCE = "MyAuthClient";
     const string KEY = "mysupersecret_secretsecretsecretkey!123";
-    public static SymmetricSecurityKey GetSymmetricSecurityKey() => 
+    public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
 }

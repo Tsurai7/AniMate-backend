@@ -40,7 +40,7 @@ public class AnimeEndpoints
             return Results.NotFound();
         });
         
-        app.MapPatch("/removeTitleFromLikes", [Authorize](HttpContext context, [FromHeader] string titleCode) =>
+        app.MapPatch("/removeTitleFromLiked", [Authorize](HttpContext context, [FromHeader] string titleCode) =>
         {
             string email = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     

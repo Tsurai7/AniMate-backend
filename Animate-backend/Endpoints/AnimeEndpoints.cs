@@ -39,5 +39,20 @@ public class AnimeEndpoints
     
             return Results.NotFound();
         });
+        
+        app.MapPatch("/removeTitleFromLikes", [Authorize](HttpContext context, [FromHeader] string titleCode) =>
+        {
+            string email = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    
+            var user = UserRepository.users.FirstOrDefault(user => user.Email == email);
+
+            if (user is not null)
+            {
+                user.LikedTitles.Remove(titleCode);
+                return Results.Ok();
+            }
+    
+            return Results.NotFound();
+        });
     }
 }

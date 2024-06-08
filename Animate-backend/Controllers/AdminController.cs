@@ -20,7 +20,7 @@ public class AdminController : ControllerBase
     {
         try
         {
-            _userRepository.AddUser(newUser);
+            _userRepository.AddUserAsync(newUser);
             return Ok("User added successfully.");
         }
         catch (Exception ex)
@@ -30,11 +30,12 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("update/{id}")]
-    public IActionResult UpdateUser(long id, User updatedUser)
+    public async Task<IActionResult> UpdateUser(long id, User updatedUser)
     {
         try
         {
-            var existingUser = _userRepository.GetAllUsers().Find(u => u.Id == id);
+            var existingUser = await _userRepository.GetUserByIdAsync(id);
+            
             if (existingUser == null)
             {
                 return NotFound("User not found.");
@@ -56,17 +57,18 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("delete/{id}")]
-    public IActionResult DeleteUser(long id)
+    public async Task<IActionResult> DeleteUser(long id)
     {
         try
         {
-            var existingUser = _userRepository.GetAllUsers().Find(u => u.Id == id);
+            var existingUser = _userRepository.RemoveUserAsync(id);
+            
             if (existingUser == null)
             {
                 return NotFound("User not found.");
             }
 
-            _userRepository.RemoveUser(id);
+            _userRepository.RemoveUserAsync(id);
             return Ok("User deleted successfully.");
         }
         catch (Exception ex)

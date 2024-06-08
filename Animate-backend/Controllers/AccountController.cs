@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Animate_backend.Models.Dtos;
 using Animate_backend.Models.Entities;
 using Animate_backend.Repositories;
@@ -13,10 +14,13 @@ namespace Animate_backend.Controllers;
 [ApiController]
 public class AccountController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
+    
     private readonly UserRepository _userRepository;
     
-    public AccountController(UserRepository userRepository)
+    public AccountController(IConfiguration configuration, UserRepository userRepository)
     {
+        _configuration = configuration;
         _userRepository = userRepository;
     }
 
@@ -35,11 +39,12 @@ public class AccountController : ControllerBase
         var claims = new List<Claim>() {new Claim(ClaimTypes.NameIdentifier, signUpRequest.Email) };
             
         var jwt = new JwtSecurityToken(
-            issuer: AuthOptions.ISSUER,
-            audience: AuthOptions.AUDIENCE,
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(100)),
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(          
+                Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)), SecurityAlgorithms.HmacSha256));
             
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
          
@@ -61,11 +66,12 @@ public class AccountController : ControllerBase
         var claims = new List<Claim>() {new Claim(ClaimTypes.NameIdentifier, signInRequest.Email) };
             
         var jwt = new JwtSecurityToken(
-            issuer: AuthOptions.ISSUER,
-            audience: AuthOptions.AUDIENCE,
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(100)),
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(          
+                Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)), SecurityAlgorithms.HmacSha256));
             
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
                 

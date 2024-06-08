@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Animate_backend.Repositories;
-using Animate_backend.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +13,8 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<ApplicationContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection")));
+
+builder.Services.AddControllers();
 
 builder.Services.AddScoped<UserRepository>();
 
@@ -51,8 +52,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
-AccountEndpoints.RegisterEndpoint(app);
-AnimeEndpoints.RegisterEndpoints(app);
 
 app.Run();
 

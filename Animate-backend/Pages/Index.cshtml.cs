@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Animate_backend.Repositories;
 using Animate_backend.Models.Entities;
-using System.Collections.Generic;
 
 namespace Animate_backend.Pages
 {
@@ -21,24 +20,24 @@ namespace Animate_backend.Pages
         [BindProperty]
         public User NewUser { get; set; }
 
-        public void OnGet()
+        public async void OnGet()
         {
-            Users = _userRepository.GetAllUsers();
+            Users =  await _userRepository.GetAllUsersAsync();
         }
 
         public IActionResult OnPostAddUser()
         {
             if (ModelState.IsValid && NewUser != null)
             {
-                _userRepository.AddUser(NewUser);
+                _userRepository.AddUserAsync(NewUser);
                 return RedirectToPage();
             }
             return Page();
         }
 
-        public void OnPostDeleteUser(long id)
+        public async void OnPostDeleteUser(long id)
         {
-            _userRepository.RemoveUser(id);
+            await _userRepository.RemoveUserAsync(id);
         }
     }
 }

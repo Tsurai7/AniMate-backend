@@ -1,47 +1,74 @@
+using Animate_backend.Data;
 using Animate_backend.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Animate_backend.Repositories;
 
-public class UserRepository
+public class UserRepository : IDisposable
 {
-    public static List<User> users = new List<User>()
+    private readonly ApplicationContext _context;
+    
+    private bool _disposed = false;
+
+    public UserRepository(ApplicationContext context)
     {
-        new User("Ken Kaneki", "test@test.com", "123", "https://i.pinimg.com/originals/e6/94/e9/e694e991d7ec9af6330657eb6ee479f5.jpg",new List<string>() {"kizumonogatari-iii-reiketsu-hen", "anatsu-no-taizai-kamigami-no-gekirin"},
-        new List<string>() {"kizumonogatari-iii-reiketsu-hen"})
-    };
+        _context = context;
+    }
 
-    public List<User> GetAllUsers()
-        {
-            return users;
-        }
+    public async Task<List<User>> GetAllUsersAsync() =>
+        await _context.Users.ToListAsync();
+    
+    public async Task<User> GetUserByIdAsync(long id) =>
+        await _context.Users.FindAsync(new object[] {id});
 
-        public void AddUser(User user)
-        {
-            users.Add(user);
-        }
+    public async void AddUserAsync(User user)
+    {
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+    }
 
-        public void RemoveUser(long id)
-        {
-            var user = users.FirstOrDefault(u => u.Id == id);
-            if (user != null)
-            {
-                users.Remove(user);
-            }
-        }
-
-        public void UpdateUser(long id, User updatedUser)
-        {
-            var user = users.FirstOrDefault(u => u.Id == id);
-            if (user != null)
-            {
-                user.Username = updatedUser.Username;
-                user.Email = updatedUser.Email;
-                user.ProfileImage = updatedUser.ProfileImage;
-                user.PasswordHash = updatedUser.PasswordHash;
-                user.WatchedTitles = updatedUser.WatchedTitles;
-                user.LikedTitles = updatedUser.LikedTitles;
-            }
-        }
-
+    public async Task<User> RemoveUserAsync(long id)
+    {
+        var user = await _context.Users.FindAsync(id);
         
+        if (user != null)
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+        return user;
+    }
+    
+    public void UpdateUser(long id, User updatedUser)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Id == id);
+        
+        if (user != null)
+        {
+            user.Username = updatedUser.Username;
+            user.Email = updatedUser.Email;
+            user.ProfileImage = updatedUser.ProfileImage;
+            user.PasswordHash = updatedUser.PasswordHash;
+            user.WatchedTitles = updatedUser.WatchedTitles;
+            user.LikedTitles = updatedUser.LikedTitles;
+        }
+    }
+    
+    protected virtual void Dispose(bool disposing)
+    {
+        if(!_disposed)
+        {
+            if(disposing)
+            {
+                _context.Dispose();
+            }
+        }
+        _disposed = true;
+    }
+    
+    public void Dispose() 
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    } 
 }

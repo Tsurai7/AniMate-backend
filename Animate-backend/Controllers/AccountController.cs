@@ -42,14 +42,12 @@ public class AccountController : ControllerBase
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-                
-        var response = new AuthResponse()
-        {
-            AccessToken = encodedJwt,
-            RefreshToken = encodedJwt
-        };
          
-        return Ok(response);
+        return Ok(new AuthResponse
+        (
+            encodedJwt,
+            encodedJwt
+        ));
     }
     
     [HttpPost("signIn")]
@@ -71,13 +69,11 @@ public class AccountController : ControllerBase
             
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
                 
-        var response = new AuthResponse()
-        {
-            AccessToken = encodedJwt,
-            RefreshToken = encodedJwt
-        };
-         
-        return Ok(response);
+        return Ok(new AuthResponse
+        (
+            encodedJwt,
+            encodedJwt
+        ));
     }
     
     [HttpGet("profile")]
@@ -89,14 +85,14 @@ public class AccountController : ControllerBase
         var user = (await _userRepository.GetAllUsersAsync()).FirstOrDefault(u => u.Email == email);
 
         if (user is not null)
-            return Ok(new 
-            {
-                username = user.Username,
-                email = user.Email,
-                profile_image = user.ProfileImage,
-                watched_titles = user.WatchedTitles,
-                liked_titles = user.LikedTitles
-            });
+            return Ok(new ProfileDto
+            (
+                user.Username,
+                user.ProfileImage,
+                user.Email,
+                user.WatchedTitles,
+                user.LikedTitles
+            ));
             
         return NotFound();
     }

@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationContext>(opt =>
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<AdminRepository>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

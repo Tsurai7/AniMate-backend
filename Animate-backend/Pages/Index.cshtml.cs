@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Animate_backend.Repositories;
 using Animate_backend.Models.Entities;
-using System.Collections.Generic;
 
 namespace Animate_backend.Pages
 {

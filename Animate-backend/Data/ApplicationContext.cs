@@ -6,10 +6,12 @@ namespace Animate_backend.Data;
 public class ApplicationContext : DbContext
 {
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Admin> Admins { get; set; } = null!;
  
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {
         Database.EnsureCreated();
+        
         InitDb();
     }
     
@@ -22,6 +24,13 @@ public class ApplicationContext : DbContext
                 new List<string>() {"kizumonogatari-iii-reiketsu-hen", "anatsu-no-taizai-kamigami-no-gekirin"},
                 new List<string>() {"kizumonogatari-iii-reiketsu-hen"}));
             
+            SaveChangesAsync();
+        }
+
+        if (!Admins.Any())
+        {
+            Admins.AddAsync(new Admin("Vladiii", "123@123.com", "123"));
+                
             SaveChangesAsync();
         }
     }
